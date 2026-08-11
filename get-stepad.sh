@@ -6,7 +6,7 @@
 #   curl -fsSL https://raw.githubusercontent.com/paulvtorres/stepad-nsp-release/main/get-stepad.sh | sudo bash
 #
 # También puedes pasar la URL directa de un instalador:
-#   sudo bash get-stepad.sh https://github.com/paulvtorres/stepad-nsp-release/releases/download/v2.0.1/stepad-nsp-installer-v2.0.1.tar.gz
+#   sudo bash get-stepad.sh https://github.com/paulvtorres/stepad-nsp-release/releases/download/v2.0.2/stepad-nsp-installer-v2.0.2.tar.gz
 #
 set -euo pipefail
 
@@ -26,15 +26,34 @@ if [ -z "${URL}" ]; then
     #    (sin API y sin python3) apunta siempre a la última versión.
     URL="https://github.com/${RELEASE_REPO}/releases/latest/download/stepad-nsp-installer.tar.gz"
     if ! curl -fsSLI "${URL}" >/dev/null 2>&1; then
-        # 2) Resolución por API (solo curl + sed, disponibles en un Debian limpio).
-        URL="$(curl -sS "https://api.github.com/repos/${RELEASE_REPO}/releases/latest" | sed -n 's/.*"browser_download_url": "\([^"]*stepad-nsp-installer[^"]*\)".*/\1/p' | head -1 || true)"
+        API_JSON="$(curl -sS "https://api.github.com/repos/${RELEASE_REPO}/releases/latest" || true)"
+
+        # 2) Resolución por API con sed (solo curl + sed).
+        URL="$(printf '%s' "${API_JSON}" | sed -n 's/.*"browser_download_url": "\([^"]*stepad-nsp-installer[^"]*\)".*/\1/p' | head -1 || true)"
+
+        # 3) Fallback con python3 (por si el formato cambia).
+        if [ -z "${URL}" ]; then
+            URL="$(printf '%s' "${API_JSON}" | python3 -c '
+import sys, json
+try:
+    d = json.load(sys.stdin)
+    for a in d.get("assets", []):
+        u = a.get("browser_download_url", "")
+        if "stepad-nsp-installer" in u:
+            print(u)
+            break
+except Exception:
+    pass
+' 2>/dev/null || true)"
+        fi
     fi
 fi
 
 if [ -z "${URL}" ]; then
     echo "ERROR: no se pudo resolver la última versión."
-    echo "Descarga el instalador e instala a mano:"
-    echo "  tar xzf stepad-nsp-installer-*.tar.gz && cd stepad-nsp && sudo bash install.sh"
+    echo "La API de GitHub tiene límite de peticiones por hora; espera unos minutos y reintenta."
+    echo "O usa la URL directa de la versión publicada:"
+    echo "  curl -fsSL https://github.com/${RELEASE_REPO}/releases/latest/download/stepad-nsp-installer-v2.0.2.tar.gz | tar xz && cd stepad-nsp && sudo bash install.sh"
     exit 1
 fi
 
