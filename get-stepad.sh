@@ -25,7 +25,7 @@ if [ -z "${URL}" ]; then
     # 1) Si cada release incluye el asset con nombre fijo, esta URL
     #    (sin API y sin python3) apunta siempre a la última versión.
     URL="https://github.com/${RELEASE_REPO}/releases/latest/download/stepad-nsp-installer.tar.gz"
-    if ! curl -fsSI "${URL}" >/dev/null 2>&1; then
+    if ! curl -fsSLI "${URL}" >/dev/null 2>&1; then
         # 2) Resolución por API (solo curl + sed, disponibles en un Debian limpio).
         URL="$(curl -sS "https://api.github.com/repos/${RELEASE_REPO}/releases/latest" | sed -n 's/.*"browser_download_url": "\([^"]*stepad-nsp-installer[^"]*\)".*/\1/p' | head -1 || true)"
     fi
