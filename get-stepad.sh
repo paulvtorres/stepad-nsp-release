@@ -22,13 +22,17 @@ fi
 if [ -z "${URL}" ]; then
     echo "==> Buscando la última versión..."
 
-    # 1) Si cada release incluye el asset con nombre fijo, esta URL
-    #    (sin API y sin python3) apunta siempre a la última versión.
-    URL="https://github.com/${RELEASE_REPO}/releases/latest/download/stepad-nsp-installer.tar.gz"
+    # 1) El instalador vive TRACKEADO en el repo (siempre la última):
+    #    se descarga directo de raw.githubusercontent, sin API ni USB.
+    URL="https://raw.githubusercontent.com/${RELEASE_REPO}/main/stepad-nsp-installer.tar.gz"
+    if ! curl -fsSLI "${URL}" >/dev/null 2>&1; then
+        # 2) Fallback: asset con nombre fijo del release (sin API).
+        URL="https://github.com/${RELEASE_REPO}/releases/latest/download/stepad-nsp-installer.tar.gz"
+    fi
     if ! curl -fsSLI "${URL}" >/dev/null 2>&1; then
         API_JSON="$(curl -sS "https://api.github.com/repos/${RELEASE_REPO}/releases/latest" || true)"
 
-        # 2) Resolución por API con sed (solo curl + sed).
+        # 3) Resolución por API con sed (solo curl + sed).
         URL="$(printf '%s' "${API_JSON}" | sed -n 's/.*"browser_download_url": "\([^"]*stepad-nsp-installer[^"]*\)".*/\1/p' | head -1 || true)"
 
         # 3) Fallback con python3 (por si el formato cambia).
