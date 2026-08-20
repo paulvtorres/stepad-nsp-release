@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
 #
-# STEPAD NSP - instalador universal (siempre la última versión).
+# STEPAD NSP - instalación desde internet en un solo comando.
 #
-# Uso (en un Debian 12 limpio, como root):
+# Uso:
 #   curl -fsSL https://raw.githubusercontent.com/paulvtorres/stepad-nsp-release/main/get-stepad.sh | sudo bash
 #
-# También puedes pasar la URL directa de un instalador:
-#   sudo bash get-stepad.sh https://github.com/paulvtorres/stepad-nsp-release/releases/download/v2.0.2/stepad-nsp-installer-v2.0.2.tar.gz
+# Descarga SIEMPRE la última versión publicada en GitHub Releases
+# del repo stepad-nsp-release (a menos que pases una URL explícita).
 #
 set -euo pipefail
 
 URL="${1:-${STEPAD_INSTALLER_URL:-}}"
 APP_USER="${APP_USER:-paulan}"
+
 RELEASE_REPO="paulvtorres/stepad-nsp-release"
 
 if [ "$(id -u)" -ne 0 ]; then
@@ -19,45 +20,20 @@ if [ "$(id -u)" -ne 0 ]; then
     exit 1
 fi
 
+# Si no se pasó una URL, resolver la última versión publicada.
 if [ -z "${URL}" ]; then
-    echo "==> Buscando la última versión..."
-
-    # 1) El instalador vive TRACKEADO en el repo (siempre la última):
-    #    se descarga directo de raw.githubusercontent, sin API ni USB.
-    URL="https://raw.githubusercontent.com/${RELEASE_REPO}/main/stepad-nsp-installer.tar.gz"
-    if ! curl -fsSLI "${URL}" >/dev/null 2>&1; then
-        # 2) Fallback: asset con nombre fijo del release (sin API).
-        URL="https://github.com/${RELEASE_REPO}/releases/latest/download/stepad-nsp-installer.tar.gz"
-    fi
-    if ! curl -fsSLI "${URL}" >/dev/null 2>&1; then
-        API_JSON="$(curl -sS "https://api.github.com/repos/${RELEASE_REPO}/releases/latest" || true)"
-
-        # 3) Resolución por API con sed (solo curl + sed).
-        URL="$(printf '%s' "${API_JSON}" | sed -n 's/.*"browser_download_url": "\([^"]*stepad-nsp-installer[^"]*\)".*/\1/p' | head -1 || true)"
-
-        # 3) Fallback con python3 (por si el formato cambia).
-        if [ -z "${URL}" ]; then
-            URL="$(printf '%s' "${API_JSON}" | python3 -c '
-import sys, json
-try:
-    d = json.load(sys.stdin)
-    for a in d.get("assets", []):
-        u = a.get("browser_download_url", "")
-        if "stepad-nsp-installer" in u:
-            print(u)
-            break
-except Exception:
-    pass
-' 2>/dev/null || true)"
-        fi
-    fi
+    echo "==> Buscando la última versión de STEPAD NSP..."
+    URL="$(
+        curl -fsSL "https://api.github.com/repos/${RELEASE_REPO}/releases/latest" \
+        | grep -o 'browser_download_url": "[^"]*stepad-nsp-installer[^"]*"' \
+        | head -1 \
+        | cut -d'"' -f4
+    )"
 fi
 
 if [ -z "${URL}" ]; then
-    echo "ERROR: no se pudo resolver la última versión."
-    echo "La API de GitHub tiene límite de peticiones por hora; espera unos minutos y reintenta."
-    echo "O usa la URL directa de la versión publicada:"
-    echo "  curl -fsSL https://github.com/${RELEASE_REPO}/releases/latest/download/stepad-nsp-installer-v2.0.2.tar.gz | tar xz && cd stepad-nsp && sudo bash install.sh"
+    echo "ERROR: no se encontró la última versión. Publica una release o pasa la URL manualmente:"
+    echo "  sudo bash get-stepad.sh <URL-del-instalador>"
     exit 1
 fi
 
@@ -70,5 +46,5 @@ echo "==> Extrayendo"
 rm -rf "/home/${APP_USER}/stepad-nsp"
 tar xzf /tmp/stepad-nsp-installer.tar.gz -C "/home/${APP_USER}"
 
-echo "==> Instalando (detecta si ya existe una versión y pregunta S/N)"
+echo "==> Instalando (detecta si ya existe una versión y la actualiza)"
 bash "/home/${APP_USER}/stepad-nsp/install.sh"
