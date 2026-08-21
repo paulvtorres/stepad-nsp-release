@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 #
-# STEPAD NSP - instalación desde internet en un solo comando.
+# STEPAD NSP - instalación / actualización desde internet.
 #
-# Uso:
+# Uso (Debian 12, como root):
 #   curl -fsSL https://raw.githubusercontent.com/paulvtorres/stepad-nsp-release/main/get-stepad.sh | sudo bash
 #
-# Descarga SIEMPRE la última versión publicada en GitHub Releases
-# del repo stepad-nsp-release (a menos que pases una URL explícita).
+# Descarga el instalador trackeado en el branch main del repo release
+# (stepad-nsp-installer.tar.gz). Publicar una versión nueva = subir ese
+# archivo al git stepad-nsp-release y hacer push a main.
 #
 set -euo pipefail
 
 URL="${1:-${STEPAD_INSTALLER_URL:-}}"
 APP_USER="${APP_USER:-paulan}"
-
 RELEASE_REPO="paulvtorres/stepad-nsp-release"
 
 if [ "$(id -u)" -ne 0 ]; then
@@ -20,20 +20,16 @@ if [ "$(id -u)" -ne 0 ]; then
     exit 1
 fi
 
-# Si no se pasó una URL, resolver la última versión publicada.
 if [ -z "${URL}" ]; then
-    echo "==> Buscando la última versión de STEPAD NSP..."
-    URL="$(
-        curl -fsSL "https://api.github.com/repos/${RELEASE_REPO}/releases/latest" \
-        | grep -o 'browser_download_url": "[^"]*stepad-nsp-installer[^"]*"' \
-        | head -1 \
-        | cut -d'"' -f4
-    )"
+    echo "==> Descargando la última versión publicada en ${RELEASE_REPO}..."
+    URL="https://raw.githubusercontent.com/${RELEASE_REPO}/main/stepad-nsp-installer.tar.gz"
 fi
 
-if [ -z "${URL}" ]; then
-    echo "ERROR: no se encontró la última versión. Publica una release o pasa la URL manualmente:"
-    echo "  sudo bash get-stepad.sh <URL-del-instalador>"
+if ! curl -fsSLI "${URL}" >/dev/null 2>&1; then
+    echo "ERROR: no se pudo descargar el instalador desde:"
+    echo "  ${URL}"
+    echo ""
+    echo "Verifica que stepad-nsp-installer.tar.gz esté en main de ${RELEASE_REPO}."
     exit 1
 fi
 
