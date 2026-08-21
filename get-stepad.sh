@@ -22,7 +22,17 @@ fi
 
 if [ -z "${URL}" ]; then
     echo "==> Descargando la última versión publicada en ${RELEASE_REPO}..."
-    URL="https://raw.githubusercontent.com/${RELEASE_REPO}/main/stepad-nsp-installer.tar.gz"
+    BASE="https://raw.githubusercontent.com/${RELEASE_REPO}/main"
+    VERSION="$(curl -fsSL "${BASE}/VERSION" | tr -d '\r\n' || true)"
+    if [ -n "${VERSION}" ]; then
+        echo "==> Versión en release: ${VERSION}"
+        URL="${BASE}/stepad-nsp-installer-${VERSION}.tar.gz"
+        if ! curl -fsSLI "${URL}" >/dev/null 2>&1; then
+            URL="${BASE}/stepad-nsp-installer.tar.gz"
+        fi
+    else
+        URL="${BASE}/stepad-nsp-installer.tar.gz"
+    fi
 fi
 
 if ! curl -fsSLI "${URL}" >/dev/null 2>&1; then
