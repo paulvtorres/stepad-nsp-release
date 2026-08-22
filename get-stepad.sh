@@ -27,18 +27,24 @@ download_installer() {
 }
 
 installer_ok() {
-    # El instalador debe traer TODAS las migraciones (hasta la mas
-    # reciente conocida) y el hotfix de backup_settings. Si falta
-    # cualquiera de las dos, es un tarball incompleto/obsoleto (p. ej.
-    # servido por una copia en cache de una version anterior).
-    tar -tzf /tmp/stepad-nsp-installer.tar.gz 2>/dev/null \
-        | grep -q 'stepad-nsp/backend/migrations/versions/0009_email_subjects.py' \
-        || return 1
+    # OJO: con `pipefail` activo, "tar -xOf ... | head -1 | grep -q ..."
+    # puede fallar por una condicion de carrera de SIGPIPE (head/grep
+    # cierran la tuberia antes de que tar termine de escribir), lo que
+    # reporta "incompleto" aunque el contenido sea correcto. Por eso se
+    # captura la salida completa en variables y se compara con bash
+    # nativo (sin tuberias hacia comandos que cortan la lectura).
+    local listing content
 
-    tar -xOf /tmp/stepad-nsp-installer.tar.gz \
-        stepad-nsp/backend/backups/models/backup_settings.py 2>/dev/null \
-        | head -1 \
-        | grep -q 'Integer, String'
+    listing="$(tar -tzf /tmp/stepad-nsp-installer.tar.gz 2>/dev/null || true)"
+
+    if [[ "${listing}" != *"stepad-nsp/backend/migrations/versions/0009_email_subjects.py"* ]]; then
+        return 1
+    fi
+
+    content="$(tar -xOf /tmp/stepad-nsp-installer.tar.gz \
+        stepad-nsp/backend/backups/models/backup_settings.py 2>/dev/null || true)"
+
+    [[ "${content}" == *"Integer, String"* ]]
 }
 
 VERSION=""
