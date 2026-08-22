@@ -68,30 +68,34 @@ fi
 
 download_installer "${URL}"
 
-if ! installer_ok; then
-    echo "AVISO: paquete obsoleto/incompleto; reintentando con el nombre genérico..."
-    download_installer "${BASE}/stepad-nsp-installer.tar.gz?$(date +%s)"
-fi
+attempt=1
+max_attempts=5
+wait_seconds=10
 
-if ! installer_ok; then
-    echo "AVISO: sigue obsoleto/incompleto; reintentando en 5s (propagación de CDN)..."
-    sleep 5
-    if [ -n "${VERSION}" ]; then
-        download_installer "${BASE}/stepad-nsp-installer-${VERSION}.tar.gz?$(date +%s)-retry"
-    else
-        download_installer "${BASE}/stepad-nsp-installer.tar.gz?$(date +%s)-retry"
+while ! installer_ok; do
+    if [ "${attempt}" -ge "${max_attempts}" ]; then
+        echo "ERROR: el instalador descargado sigue incompleto/obsoleto tras ${attempt} intentos"
+        echo "(falta la migración 0009 o el fix de backup_settings)."
+        echo "Esto suele ser el CDN de GitHub propagando el release; espera 1-2"
+        echo "minutos y reintenta el mismo comando, o aplica el parche manual:"
+        echo "  sudo sed -i 's/Integer\$/Integer, String/' /home/${APP_USER}/stepad-nsp/backend/backups/models/backup_settings.py"
+        echo "  sudo bash /home/${APP_USER}/stepad-nsp/install.sh"
+        exit 1
     fi
-fi
 
-if ! installer_ok; then
-    echo "ERROR: el instalador descargado sigue incompleto/obsoleto tras reintentos"
-    echo "(falta la migración 0009 o el fix de backup_settings)."
-    echo "Espera un minuto (propagación de CDN) y reintenta el mismo comando, o"
-    echo "aplica el parche manual:"
-    echo "  sudo sed -i 's/Integer\$/Integer, String/' /home/${APP_USER}/stepad-nsp/backend/backups/models/backup_settings.py"
-    echo "  sudo bash /home/${APP_USER}/stepad-nsp/install.sh"
-    exit 1
-fi
+    echo "AVISO: paquete obsoleto/incompleto (posible CDN sin propagar);"
+    echo "       reintentando en ${wait_seconds}s (intento $((attempt + 1))/${max_attempts})..."
+    sleep "${wait_seconds}"
+
+    if [ -n "${VERSION}" ] && [ $((attempt % 2)) -eq 1 ]; then
+        download_installer "${BASE}/stepad-nsp-installer-${VERSION}.tar.gz?$(date +%s%N)"
+    else
+        download_installer "${BASE}/stepad-nsp-installer.tar.gz?$(date +%s%N)"
+    fi
+
+    attempt=$((attempt + 1))
+    wait_seconds=$((wait_seconds + 10))
+done
 
 id -u "${APP_USER}" >/dev/null 2>&1 || useradd -m -s /bin/bash "${APP_USER}"
 
