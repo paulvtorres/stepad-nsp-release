@@ -23,15 +23,18 @@ fi
 if [ -z "${URL}" ]; then
     echo "==> Descargando la última versión publicada en ${RELEASE_REPO}..."
     BASE="https://raw.githubusercontent.com/${RELEASE_REPO}/main"
-    VERSION="$(curl -fsSL "${BASE}/VERSION" | tr -d '\r\n' || true)"
+    # VERSION solo informativa; el tarball canónico es stepad-nsp-installer.tar.gz
+    # (siempre el último publicado). Evita CDN obsoleto en VERSION apuntando a
+    # un instalador versionado antiguo.
+    VERSION="$(curl -fsSL "${BASE}/VERSION?$(date +%s)" | tr -d '\r\n' || true)"
+    URL="${BASE}/stepad-nsp-installer.tar.gz"
     if [ -n "${VERSION}" ]; then
         echo "==> Versión en release: ${VERSION}"
-        URL="${BASE}/stepad-nsp-installer-${VERSION}.tar.gz"
-        if ! curl -fsSLI "${URL}" >/dev/null 2>&1; then
-            URL="${BASE}/stepad-nsp-installer.tar.gz"
+    fi
+    if ! curl -fsSLI "${URL}" >/dev/null 2>&1; then
+        if [ -n "${VERSION}" ]; then
+            URL="${BASE}/stepad-nsp-installer-${VERSION}.tar.gz"
         fi
-    else
-        URL="${BASE}/stepad-nsp-installer.tar.gz"
     fi
 fi
 
