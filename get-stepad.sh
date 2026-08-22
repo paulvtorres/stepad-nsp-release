@@ -27,31 +27,61 @@ download_installer() {
 }
 
 installer_ok() {
+    # El instalador debe traer TODAS las migraciones (hasta la mas
+    # reciente conocida) y el hotfix de backup_settings. Si falta
+    # cualquiera de las dos, es un tarball incompleto/obsoleto (p. ej.
+    # servido por una copia en cache de una version anterior).
+    tar -tzf /tmp/stepad-nsp-installer.tar.gz 2>/dev/null \
+        | grep -q 'stepad-nsp/backend/migrations/versions/0009_email_subjects.py' \
+        || return 1
+
     tar -xOf /tmp/stepad-nsp-installer.tar.gz \
         stepad-nsp/backend/backups/models/backup_settings.py 2>/dev/null \
         | head -1 \
         | grep -q 'Integer, String'
 }
 
+VERSION=""
+
 if [ -z "${URL}" ]; then
     echo "==> Descargando la última versión publicada en ${RELEASE_REPO}..."
     VERSION="$(curl -fsSL "${BASE}/VERSION?$(date +%s)" | tr -d '\r\n' || true)"
     if [ -n "${VERSION}" ]; then
         echo "==> Versión en release: ${VERSION}"
+        # Preferir el paquete FIJADO a esa version (URL unica que nunca
+        # se sobreescribe) en vez del nombre generico "latest": ese
+        # nombre SI se sobreescribe en cada release y el CDN de GitHub
+        # puede tardar en refrescarlo, sirviendo por minutos una copia
+        # vieja/incompleta bajo el mismo nombre (p. ej. sin la ultima
+        # migracion de base de datos).
+        URL="${BASE}/stepad-nsp-installer-${VERSION}.tar.gz?$(date +%s)"
+    else
+        URL="${BASE}/stepad-nsp-installer.tar.gz?$(date +%s)"
     fi
-    URL="${BASE}/stepad-nsp-installer.tar.gz?$(date +%s)"
 fi
 
 download_installer "${URL}"
 
 if ! installer_ok; then
-    echo "AVISO: paquete obsoleto en CDN; probando v2.5.19..."
-    download_installer "${BASE}/stepad-nsp-installer-v2.5.19.tar.gz?$(date +%s)"
+    echo "AVISO: paquete obsoleto/incompleto; reintentando con el nombre genérico..."
+    download_installer "${BASE}/stepad-nsp-installer.tar.gz?$(date +%s)"
 fi
 
 if ! installer_ok; then
-    echo "ERROR: el instalador descargado no incluye el fix de backup_settings."
-    echo "Parche manual y reintento:"
+    echo "AVISO: sigue obsoleto/incompleto; reintentando en 5s (propagación de CDN)..."
+    sleep 5
+    if [ -n "${VERSION}" ]; then
+        download_installer "${BASE}/stepad-nsp-installer-${VERSION}.tar.gz?$(date +%s)-retry"
+    else
+        download_installer "${BASE}/stepad-nsp-installer.tar.gz?$(date +%s)-retry"
+    fi
+fi
+
+if ! installer_ok; then
+    echo "ERROR: el instalador descargado sigue incompleto/obsoleto tras reintentos"
+    echo "(falta la migración 0009 o el fix de backup_settings)."
+    echo "Espera un minuto (propagación de CDN) y reintenta el mismo comando, o"
+    echo "aplica el parche manual:"
     echo "  sudo sed -i 's/Integer\$/Integer, String/' /home/${APP_USER}/stepad-nsp/backend/backups/models/backup_settings.py"
     echo "  sudo bash /home/${APP_USER}/stepad-nsp/install.sh"
     exit 1
