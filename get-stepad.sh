@@ -60,7 +60,7 @@ if [ -z "${URL}" ]; then
         # puede tardar en refrescarlo, sirviendo por minutos una copia
         # vieja/incompleta bajo el mismo nombre (p. ej. sin la ultima
         # migracion de base de datos).
-        URL="${BASE}/stepad-nsp-installer-${VERSION}.tar.gz?$(date +%s)"
+        URL="${BASE}/stepad-nsp-installer.tar.gz?$(date +%s)"
     else
         URL="${BASE}/stepad-nsp-installer.tar.gz?$(date +%s)"
     fi
@@ -88,7 +88,7 @@ while ! installer_ok; do
     sleep "${wait_seconds}"
 
     if [ -n "${VERSION}" ] && [ $((attempt % 2)) -eq 1 ]; then
-        download_installer "${BASE}/stepad-nsp-installer-${VERSION}.tar.gz?$(date +%s%N)"
+        download_installer "${BASE}/stepad-nsp-installer.tar.gz?$(date +%s%N)"
     else
         download_installer "${BASE}/stepad-nsp-installer.tar.gz?$(date +%s%N)"
     fi
