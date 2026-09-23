@@ -100,6 +100,30 @@ done
 id -u "${APP_USER}" >/dev/null 2>&1 || useradd -m -s /bin/bash "${APP_USER}"
 
 echo "==> Extrayendo"
+
+# Blinda las claves ANTES de tocar la instalación: cada update guarda
+# una copia versionada del env actual (incluye STEPAD_RESTIC_PASSWORD o
+# cualquier secreto generado), de modo que NUNCA se pierde la capacidad
+# de descifrar los repositorios de respaldo existentes aunque algo falle.
+ENV_FILE="/etc/stepad/stepad.env"
+if [ -f "${ENV_FILE}" ]; then
+  BK_DIR="/etc/stepad/env-backups"
+  mkdir -p "${BK_DIR}"
+  chmod 0700 "${BK_DIR}"
+  TS="$(date +%Y%m%d-%H%M%S)"
+  if ! grep -q "STEPAD_RESTIC_PASSWORD" "${ENV_FILE}" >/dev/null 2>&1 \
+     && command -v sha256sum >/dev/null 2>&1; then
+    HASH="$(sha256sum "${ENV_FILE}" 2>/dev/null | cut -d' ' -f1 | cut -c1-8)"
+  else
+    HASH="missing-${TS}"
+  fi
+  DEST="${BK_DIR}/stepad.env.${TS}.${HASH}"
+  cp -a "${ENV_FILE}" "${DEST}"
+  chmod 0600 "${DEST}"
+  find "${BK_DIR}" -maxdepth 1 -name "stepad.env.*" -type f -mtime +90 -delete 2>/dev/null
+  echo "==> Env respaldado en ${DEST} (por si se necesita recuperar claves)"
+fi
+
 rm -rf "/home/${APP_USER}/stepad-nsp"
 tar xzf /tmp/stepad-nsp-installer.tar.gz -C "/home/${APP_USER}"
 
