@@ -1,0 +1,419 @@
+# Changelog STEPAD NSP
+
+Historial de releases (el repo se reconstruyo el 2026-10-21 para eliminar
+instaladores antiguos que incluian la contrasena de admin por defecto).
+
+- v2.5.0: segmento LAN dinamico, exclusiones IP/rangos, logs con nombre, dispositivos de red ocultos, tuning suricata
+- v2.5.1: persistencia de bloqueos, hora local, clasificacion PCs, reinicios, navegacion OK
+- v2.5.2: responsive (scroll tablas) + fixes previos
+- v2.5.3: nombres en escaneo, fixes de clasificador, alertas de boot y reinicio
+- v2.5.4: tipo CAM/Otro, reclasificar al vuelo, fixes de nombres y alertas
+- v2.5.5: lease infinito, registro de arranques, fix logging DNS, alertas veridicas
+- v2.5.6: tabla compacta de dispositivos (luz/tipo/ip, detalles ocultos)
+- v2.5.7: ordenar lista, vincular NICs, tipo servidores, overlay escaneo, barrido subred, estado automatico
+- v2.5.8: enfasis en malware (feed diario URLhaus/OpenPhish + tarjeta Protección Malware)
+- v2.5.9: respuesta automatica ante malware (cuarentena por MAC, bloqueo C2 por IP, eventos en panel), Alembic como gestor de esquema, DoT/DoH con persistencia
+- v2.5.9 (fix instalador): migracion Alembic como root, stamp dinamico segun estado de BD, sin create_all en install.py
+- v2.5.9 (fix DNS de grupo): registros de navegacion de dispositivos en grupos (protobuf + RPZ YAML)
+- v2.5.10: ojo para ver contrasena en login, On/Off ordenable en dispositivos, IP en Excel de navegacion
+- v2.5.10 (fix UI): ojo en login, quitar resumen por equipo + fecha hoy, CSS pantalla interfaces
+- v2.5.10 (fix UI): bloqueo por IP de servicios con un solo checkbox persistente
+- v2.5.10 (fix UI): Sin asignar solo con select de rol (sin boton Confirmar)
+- v2.5.10 (fix): bloqueo de dominios desde la UI (POST /security/rules con barra final)
+- v2.5.10 (fix): bloqueo de dominios desde la UI - tolerancia de barra final en la API
+- v2.5.10 (fix UI): texto Mostrar dispositivos de red visible en blanco
+- v2.5.10 (fix): fechas de Registro y Excel en hora local
+- v2.5.10 (feat): estado en vivo con ping en dispositivos, escaneo profundo para casos extremos
+- v2.5.10 (fix UI): texto Mostrar dispositivos de red en blanco puro
+- v2.5.10 (feat): tarjeta Navegando ahora en el Panel
+- v2.5.10 (feat): resumen por equipo en Registro
+- v2.5.10 (feat): resumenes de navegacion de los ultimos 10 minutos
+- v2.5.10 (fix): auto-refresco del Registro (resumen 10 min al dia)
+- v2.5.10 (fix UI): resumen 10 min primero en Registro
+- v2.5.10 (fix): rango de fechas en Registro interpretado en hora local (no cortaba la navegacion)
+- v2.5.10 (fix): problema de fechas resuelto en todos los filtros (utilidad compartida)
+- v2.5.10 (fix): solo navegacion efectiva en resumenes
+- v2.5.10 (fix): solo se registran navegaciones efectivas
+- v2.5.10 (feat): reporte SNI de conexiones HTTPS por dominio + registro solo navegacion efectiva + fechas en hora local
+- v2.5.10 (fix UI): Navegando ahora en lista con dominios separados por coma
+- v2.5.10 (fix UI): SNI solo en el Panel
+- v2.5.10 (feat): Panel con total de equipos navegando + pagina Navegacion en vivo
+- v2.5.10 (fix): Navegacion en vivo del momento, sin selector de tiempo
+- v2.5.10 (fix): logs solo con dominios resueltos (sin NXDOMAIN)
+- v2.5.10 (fix): reportes/Excel siempre con IP
+- v2.5.10 (feat): alertas del IPS con detalle y aislamiento rapido
+- v2.5.10 (feat): pagina de Alertas en el menu
+- v2.5.10 (fix): detalle de alertas con equipo origen
+- v2.5.10 (feat): guia practica en alertas
+- v2.5.10 (fix): alertas con guia general en encabezado y consulta de firma
+- v2.5.10 (feat): campanita de alertas criticas
+- v2.5.10 (feat): Paginas mas navegadas
+- v2.5.10 (feat): pagina Paginas mas navegadas
+- v2.5.10 (feat): buscador y marcado de sospechosos en Paginas mas navegadas
+- v2.5.10 (fix): correccion de falso positivo en respuesta automatica
+- v2.5.11: Seguridad de red: sysctl hardening, DNS open-resolver fix, redirect DNS, cuarentena INPUT, C2 scope LAN, live NAT/WAN
+- v2.5.12: Bloqueos laborales de raiz, Invitados sin restricciones extra, IPS, navegacion, WAN, grupos
+- v2.5.13: Fix build frontend Interfaces.jsx
+- v2.5.14: Fix descarga instalador versionada e Interfaces.jsx build
+- v2.5.15: Ajustes rediseñados, Excel DNS, notificaciones y perfil de empresa
+- v2.5.16: Cuenta SMTP con presets Gmail/Outlook y fix selección de proveedor
+- v2.5.17: Fix error 500 en cuenta de correo (PostgreSQL)
+- v2.5.18: Para/CCO por reporte, prueba de correo, instalador con dist y migración 0008
+- v2.5.19: fix import String en backup_settings (install roto en v2.5.18)
+- v2.5.20: hotfix install String + get-stepad verifica tarball
+- v2.5.21: fix prueba de correo UI y SMTP no bloqueante
+- v2.5.22: Gmail puerto 465 SSL, guardado SMTP rápido y fix prueba de correo
+- v2.5.23: Asuntos de correo profesionales configurables por plantilla
+- v2.5.24: Reporte navegación por equipo, Excel profesional y fix tiempo activo
+- v2.5.25: Correo sin cuerpo, fix horas activas y orden por dominio mas usado
+- v2.5.26: Escaneo de red mas liviano (sin colgar la API), deteccion de rename de equipos aunque el lease DHCP quede obsoleto, correo sin cuerpo con navegacion ordenada por dominio mas usado, fix de transacciones colgadas y DHCP duplicado, botones de reinicio/apagado movidos a su propio menu
+- v2.5.27: test
+- v2.5.28: Fix: los intentos bloqueados por politica DNS habian dejado de registrarse desde el 16/ago, dejando en cero (silenciosamente) el panel de Proteccion, la hoja de bloqueados del reporte por correo, el reporte de cumplimiento y la alerta de pico de bloqueos. Se restaura el registro sin afectar el calculo de navegacion ni de horas activas.
+- v2.5.29: Alerta prioritaria de seguridad DNS (mineria/malware) con script de limpieza y CC/CCO
+- v2.5.30: Deteccion de equipos con lease DHCP pero sin respuesta ARP (celulares en ahorro de energia)
+- v2.5.31: Fix: IP de equipos con lease actualizado que no responden ARP a tiempo
+- v2.5.32: Script de diagnostico de intrusos (acceso remoto no autorizado) descargable desde Alertas
+- v2.5.33: Limpiador automatico de minero + fix restarts encadenados de Suricata
+- v2.5.34: Fix: contraste ilegible en Control del servidor (Reinicio y apagado)
+- v2.5.35: Subrango IP grupos, dns_alias_ip y SNI antievasión
+- v2.5.36: Dispositivos: columna SO, luces verde/gris; quitar minería
+- v2.5.37: Fix crear grupo + refactor sync/locks
+- v2.5.38: RustDesk self-hosted: acceso remoto tipo AnyDesk para teletrabajo
+- v2.5.39: Listado: routers/mesh Deco visibles aunque offline
+- v2.5.40: DHCP estable, salud de red, alertas separadas y listado completo de dispositivos
+- v2.5.41: Equipos aislados, email cuarentena y visibilidad en panel
+- v2.5.42: Filtro dominio IPS, fix menú cuarentena y caché UI
+- v2.5.43: Hora Ecuador en alertas y logs DHCP en UI
+- v2.5.43: Hora Ecuador en alertas y logs DHCP en UI
+- v2.5.44: add DHCP section with reservation cleanup, stats, and email alerts
+- v2.5.45: multi-LAN context selector and descriptive zone setup
+- v2.5.46: feat(shares): network disk shares controlled by device groups
+- v2.5.47: feat(shares): dedicated secondary disk with format and guided UI
+- v2.5.48: multi-volume shares with split UI for folders and permissions Allow sharing several named partitions at once, and manage each volume’s folders and group access in a two-pane Disco de red screen.
+- v2.5.49: feat(shares): disk health, ransomware tripwire, and partition delete
+- v2.5.50: Fix instalador (wipefs) + disco de red
+- v2.5.51: feat(shares): format a whole empty disk from the UI
+- v2.5.52: fix(shares): partition and free-space parsing under es_ES locale; create partition unformatted with size defaults
+- v2.5.53: fix(shares): programming backup disks
+- v2.5.53: network share backup with SMB mount, LAN scan, browse, auto-prune
+- v2.5.54: fix(shares): hide backup vault in web file explorer and remove stale paths
+- v2.5.55: fix(api): remove stray network_units import that broke app module loading
+- v2.5.56: fix(api): restore missing network_units router import
+- v2.5.57: fix(api): rewrite trailing-slash middleware to redirect instead of double dispatch
+- v2.5.58: fix(shares): persisten credenciales SMB de respaldos para montajes de red
+- v2.5.59: fix(shares): prueba de conexión de unidades de red funciona (GET) y montaje de unidades
+- v2.5.60: fix(shares): test de conexión SMB ahora navega a subcarpetas con espacios (test/browse)
+- v2.5.61: fix(shares): validar credenciales SMB contra el host cuando share está vacío (asistente de conexión)
+- v2.5.62: fix(shares): nombres completos con espacios al navegar shares SMB (browse)
+- v2.5.63: Unidades de Red: navegacion de subcarpetas (browse+seleccion)
+- v2.5.64: Network units montadas aparecen como origen de respaldo
+- v2.5.65: Limpieza UI: sin tab respaldos, sin scanner en form, Respaldo auto en units
+- v2.5.66: Restaurar vista respaldos sin tab
+- v2.5.67: Backup: soporte units de red como origen
+- v2.5.68: Fix: errores y avisos visibles en form de respaldos
+- v2.5.69: Fix: form respaldos pre-llena origen desde carpeta
+- v2.5.70: Fix: error de sintaxis en form respaldos
+- v2.5.71: Fix: networkShare not defined
+- v2.5.72: Fix: listar jobs de unidades de red
+- v2.5.73: Fix: groups 404
+- v2.5.74: DHCP health icon + pool_end fix
+- v2.5.75: Timezone sync, permanent IP, backup fixes
+- v2.5.76: Devices sort by IP numeric
+- v2.5.77: IP pool selector for permanent reservation
+- v2.5.78: Backup running indicator
+- v2.5.79: Export devices to Excel
+- v2.5.80: Fix: export button blank page
+- v2.5.81: Days disconnected column
+- v2.5.83: Fix days column
+- v2.5.85: Fix syntax error
+- v2.5.86: Export Excel format
+- v2.5.87: Export XLSX format
+- v2.5.88: Backup error display + auto credentials
+- v2.5.89: Auto-fetch SMB credentials
+- v2.5.90: Auto-load IP pool
+- v2.5.92: Auto DHCP sync
+- v2.5.93: Persist device details toggle
+- v2.5.95: Fix api quotes
+- v2.5.96: Protect permanent IPs from discovery
+- v2.5.97: Block IP overwrites for permanent
+- v2.5.98: Manual cleanup offline IPs
+- v2.5.99: Block/unblock device UI
+- v2.5.90: Clean IP management + permanent_ip
+- v2.5.91: Fix IP consistency root causes
+- v2.5.92: Fix live status DHCP check
+- v2.5.93: Auto sync-ips in monitoring
+- v2.5.100: Fix live status ARP check
+- v2.5.101: Restore permanent_ip handling
+- v2.5.102: Fix discovery ip_address update
+- v2.5.103: Add DhcpSyncService
+- v2.5.104: Fix backup scheduler + mount
+- v2.5.105: Backup running banner
+- v2.5.106: Exclude Respaldo from ransomware watch
+- v2.5.107: Knight Rider backup indicator
+- v2.5.108: Backup exclude system files
+- v2.5.109: Fix TopBar banner JSX
+- v2.5.110: Fix networkShare + groups errors
+- v2.5.111: Fix CIFS EBUSY + scheduler singleton
+- v2.5.112: Visible backup error display
+- v2.5.113: CIFS mount stability (nobrl, soft, echo 15)
+- v2.5.114: Fix hanging backup scan on network shares
+- v2.5.115: Consistent running state via singleton
+- v2.5.116: Faster backup list (no 60s hangs)
+- v2.5.117: Idempotent permanent_ip migration
+- v2.5.118: Device classifier: 10 types + reclassified all devices
+- v2.5.119: Fix fresh install: migrations before users query
+- v2.5.120: installer: fixed default admin password, never printed
+- v2.5.121: installer/update resets admin to default password
+- v2.5.122: installer final screen shows web/Tailscale connection info
+- v2.5.123: Tailscale setup screen in VPN page
+- v2.5.124: Device share invites on VPN Tailscale page
+- v2.5.125: Save Tailscale API token from web
+- v2.5.126: Connect Tailscale: spinner + errors
+- v2.5.127: Tailscale error inline en seccion
+- v2.5.128: Instalar Tailscale siempre en instalador
+- v2.5.129: Respaldo de datos: menu propio con destino elegible y robustez ante fallos
+- v2.5.130: Respaldo de datos: listado de respaldos y detalle por job
+- v2.5.131: Respaldo: auto-crea la carpeta privada Respaldo faltante y muestra errores al guardar
+- v2.5.132: Respaldo: excluye unidades inexistentes del listado y avisa si el origen ya no existe
+- v2.5.133: Respaldo: destinos de unidades de red se marcan como no válidos en el selector
+- v2.5.134: Respaldo: seleccion explicita de origen y destino, sin opcion automatica ni valores por defecto
+- v2.5.135: Respaldo: destinos se muestran como carpeta privada UNC; sin boton Programar respaldo en carpetas
+- v2.5.136: Respaldo: cualquier carpeta privada local es destino; paths de carpetas sin romper en vertical
+- v2.5.137: respaldo: un job nuevo daily no corre por horarios que ya pasaron hoy; espera la proxima hora programada
+- v2.5.138: respaldo: job diario recien creado solo corre en su proxima hora programada exacta
+- v2.5.139: respaldo: saltar a proximo horario (pausa) y parar (cancela respaldo en curso); quito boton Compartir de las filas
+- v2.5.140: respaldo: valida espacio destino vs tamano del origen al programar y bloquea si no alcanza
+- v2.5.141: alertas: silenciar tipo de mensaje; nuevo dispositivo una vez por dia; proteccion reorganizada; respaldos sin bloque de estado
+- v2.5.142
+- v2.5.143
+- v2.5.143: installer no-disruptivo
+- v2.5.143: installer no-disruptivo + doc
+- v2.5.144: backup sistema, fuerza bruta, health check, menu reorganizado
+- v2.5.144: backup sistema, fuerza bruta, balanceo carga, health check, settings reorganizado
+- v2.5.144
+- v2.5.144: zones, responsive, reorganized
+- v2.5.144: NIC change dialog, zone selector, responsive
+- v2.5.145
+- v2.5.146
+- v2.5.146
+- v2.5.146: syntax fixes
+- v2.5.146: cp fallback installer
+- v2.5.146: restore original installer
+- v2.5.146: installer always copies to APP_DIR
+- v2.5.146: APP_DIR fix
+- v2.5.146: ver contenido antes de formatear
+- v2.5.146: fix ver contenido
+- v2.5.146: fix device format + ver contenido
+- v2.5.147: Unificador explorador de discos, reserva de IP, limpieza del instalador
+- v2.5.148: Fix Samba detection, unified disk explorer, IP reservation
+- v2.5.149: Fix post-migration column verification, DB repair on install
+- v2.5.150: Restore folder sharing: create, share with groups, permissions
+- v2.5.151: Add Compartir button for folder sharing
+- v2.5.152: Fix disk explorer uses volume mountpoint for shared partitions
+- v2.5.153: Add Compartir button in disk explorer for shared volumes
+- v2.5.154: Share folders from disk explorer auto-activates volume
+- v2.5.155: Rebuild frontend with folder share support
+- v2.5.156: Fix JSX onShareFolder prop placement
+- v2.5.157: Include shared folders as backup destinations
+- v2.5.158: Folder browser dialog for backup destination
+- v2.5.159: Folder browser shows all mounted disks
+- v2.5.160: Rebuild with folder browser
+- v2.5.161: Folder browser for backup origin/destination
+- v2.5.162: Folder browser shows all mounted disks
+- v2.5.163: Mount-points filters system paths, allowed_roots dynamic
+- v2.5.164: Mount-points shows only top-level mounts
+- v2.5.165: Mount-points excludes /mnt when subdirs exist
+- v2.5.166: Dynamic mount points, no hardcoded paths, cleanup
+- v2.5.167: Backup destination verification before run
+- v2.5.168: Storage unit monitoring and destination alerts
+- v2.5.169: Disk explorer default view + destination monitoring
+- v2.5.170: Auto-skip stale disk paths + I/O error handling
+- v2.5.163: Backup progress bar with real-time updates
+- v2.5.164: Filter stale network units from backup sources
+- v2.5.165: drop stale mount points from Examinar drive list
+- v2.5.166: catch subprocess errors in ShareDiskMountProvider._run to avoid bare 500s on delete-partition
+- v2.5.168: Fix: listar solo unidades y particiones presentes (sin fantasmas de discos desconectados)
+- v2.5.171: Fix pipeline: usar el instalador recien construido (no versiones viejas)
+- v2.5.172: Fix: una sola columna en Unidades de disco (sin boton Explorar); delete-partition confirma particiones en uso y borra wipefs solo tras exito
+- v2.5.173: boton Explorar contenido en cada particion
+- v2.5.174: Explorar contenido en unidades de red montadas
+- v2.5.175: fix respaldos (auto-mount red, no colgar con cifs caido, bloquear delete con respaldos)
+- v2.5.177: fix snapshots + UI clearer headings & space warning
+- v2.5.178: respaldos async + vaults dinamicos + cifs seguro
+- v2.5.180: seguridad - Respaldo nunca por Samba (veto files + guard en build_samba_shares)
+- v2.5.181: formatear particion nueva tras crear (no reaparecen carpetas viejas)
+- v2.5.182: DHCP - IPs reservadas excluidas del pool + sync periodico de ip_address
+- v2.5.183: backup timeout 24h (no cortar respaldo nocturno grande)
+- v2.5.184: detalle dispositivo - IP reservada + limpieza de duplicados
+- v2.5.185: respaldo del sistema automatico programado + alertas de fallo + UI horario
+- v2.5.186: fix paginas mas visitadas (NameError en find_summary)
+- v2.5.187: fix respaldos programados colgados + descubrimiento dinamico de unidades
+- v2.5.188: montar particion al crearla (unidades siempre disponibles para respaldos)
+- v2.5.189: saltar a prox horario cancela respaldo en curso
+- v2.5.190: un solo boton saltar a proximo horario
+- v2.5.191: Desactivar cancela respaldo en curso (pausa total), Activar retoma
+- v2.5.192: estado Cancelado en respaldos + Desactivar pausa total
+- v2.5.193: instalador arranca PostgreSQL en maquina nueva (fix error SQL)
+- v2.5.194: paginas mas visitadas rapido + instalador postgres fix
+- v2.5.195: historial DNS rapido (7 dias default en vista y export)
+- v2.5.196: respaldos agrupados por unidad destino
+- v2.5.197: mismo rol migra zona+DHCP a NIC nueva
+- v2.5.198: auto reemplazo NIC inequivoco
+- v2.5.199: Ejecutar ahora funciona con repo restic desincronizado
+- v2.5.200: password restic nunca rota al reinstalar + Ejecutar ahora siempre funciona
+- v2.5.201: claves restic rezervadas en cada update (env-backups)
+- v2.5.202: respaldo de sistema operativo funcional (claves recuperables)
+- v2.5.203: clave restic auto-restaurable, nunca rota sola
+- v2.5.204: SecretManager central, claves jamás se pierden
+- v2.5.205: particiones por rol + montaje por demanda
+- v2.5.206: selector tipo + delete particion 1 paso
+- v2.5.207: restaurar versión completa al origen (recuperación transparente)
+- v2.5.208: restauracion de desastre directa y rapida
+- v2.5.209: crear particion siempre pide finalidad + cambiar finalidad posterior
+- v2.5.210: modal responsive de finalidad al crear particion
+- v2.5.211: origen!=backup, destino=backup obligatorio con default
+- v2.5.212: destino backup etiquetado + explorador solo respaldo
+- v2.5.213: explorador destino usa particiones backup + badges de tipo
+- v2.5.214: guardar respaldo monta la particion backup por demanda
+- v2.5.215: programacion no borra datos + purge + cola
+- v2.5.217: solo respaldo por horario, elimina modo on-change
+- v2.5.218: el update nunca pierde acceso remoto
+- v2.5.219: programaciones se crean con la particion de respaldo
+- v2.5.220: WAN nunca se corta + verificador conectividad en updates
+- v2.5.221: arranque NSP no se cuelga en Samba
+- v2.5.222: instalador no se corta en frontend por NVM_DIR
+- v2.5.223: programacion auto en particion backup + logs cortes internet
+- v2.5.224: boton Gestionar siempre visible (scroll tabla)
+- v2.5.225: reporte continuo de tiempo sin internet
+- v2.5.226: reporte cortes internet en Monitoreo WAN
+- v2.5.227: reservas IP fuente unica + no-robo + zonas dinamicas + online ARP
+- v2.5.228: fix web con zona que comparte gateway con recursor del sistema
+- v2.5.229: fix backup placeholder Origen no disponible
+- v2.5.230: respaldos ligados a particion; eliminar particion borra programacion; origen solo primera vez
+- v2.5.231: redimensionar particiones + espacio usado/total
+- v2.5.232: fix programaciones fantasma sin particion backup
+- v2.5.233: fix particion backup se registra con rol y programacion; grafico de espacio
+- v2.5.234: limpiar mountpoint residual al registrar unidad
+- v2.5.236: monitoring OutagesCard + origen red + scheduler particion backup
+- v2.5.237: programacion de particion backup se escribe dentro de la particion
+- v2.5.238: UI respaldo simplificada + desactivar sin cancelado
+- v2.5.239: desactivar no muestra cancelado por el usuario
+- v2.5.240: boton redimensionar en Discos y particiones
+- v2.5.241: respaldo CIFS mas rapido (actimeo/cache) + tope 48h
+- v2.5.242: mount unidad de red con cache
+- v2.5.243: respaldo lento por pipe de progreso (fix hilo drenado)
+- v2.5.244: creacion dinamica de particiones de respaldo + fix prune
+- v2.5.245: historial con duracion + log sin cambios
+- v2.5.246: restore con selector de destino y chequeo de espacio
+- v2.5.247: retomar respaldo cortado desde donde quedo
+- v2.5.248: no mostrar Sin cambios si hubo snapshot
+- v2.5.249: fix restore no ejecutaba
+- v2.5.250: barra superior Restaurando respaldo
+- v2.5.251: restore completo con montado de destino, barra de progreso y validacion
+- v2.5.252: no snapshot vacio en redes sin cambios
+- v2.5.253: restaurar lista todas las unidades
+- v2.5.254: restaurar lista unidades desmontadas
+- v2.5.255: fix restore 500 y listar unidades
+- v2.5.256: restaurar plano en destino elegido
+- v2.5.257: explorar particion abria otra unidad
+- v2.5.258: ver archivos restaurados en vivo
+- v2.5.259: bloquear eliminar particion en uso
+- v2.5.260: progreso real de restauracion
+- v2.5.261: barra de restauracion global
+- v2.5.262: restauracion sin mnt anidado
+- v2.5.263: barra de restauracion con progreso real
+- v2.5.264: espacio usado en todas las unidades
+- v2.5.265: progreso real de restauracion
+- v2.5.266: descargar snapshot completo en tar
+- v2.5.267: auto-baseline de red
+- v2.5.268: elegir donde guardar el tar
+- v2.5.269: avisos de descarga tar
+- v2.5.270: descarga streaming del tar
+- v2.5.271: tar no satura con backup; skip robusto
+- v2.5.272: discos ocupados + filtro equipo/ip en proteccion
+- v2.5.273: aviso tamano en restauracion
+- v2.5.274: explorar y descargar via principal
+- v2.5.275: descargas streaming + tar aplanado sin mnt/
+- v2.5.276: descarga de carpeta correcta
+- v2.5.277: staging de descarga en disco real
+- v2.5.278: tar de carpeta plano, staging en disco real
+- v2.5.279: descarga directa por URL
+- v2.5.280: descarga blob header auth
+- v2.5.281: solo auth por header
+- v2.5.282: descarga directa por URL con token dl
+- v2.5.283: respaldo de red detecta cambios futuros
+- v2.5.284: retencion robusta ante lock residual
+- v2.5.285: antiransomware ignora restauraciones
+- v2.5.286: programacion visible tras actualizar
+- v2.5.287: estructura de respaldos limpia
+- v2.5.288: restic a prioridad minima - navegacion no se afecta
+- v2.5.289: watchdog ignora backup; listado reintenta
+- v2.5.290: installer no deja venv roto
+- v2.5.291: particion backup estable
+- v2.5.292: botones descarga con efecto presionado
+- v2.5.293: origen red se monta al guardar
+- v2.5.294: filtrar jobs placeholder
+- v2.5.295: programacion de particion backup visible
+- v2.5.296: limpieza de huerfanos solo local
+- v2.5.297: auto-desbloqueo ransomware
+- v2.5.298: destino auto
+- v2.5.299: no borrar bovedas en cleanup de stale
+- v2.5.300: eliminar programacion de respaldo
+- v2.5.301: fix ids de job duplicados + no crear version sin cambios
+- v2.5.302: security: instalador sin credenciales (AGENTS.md/.env) + AGENTS sin passwords + publish fix
+- v2.5.303: feat: proceso de respaldos dinamico por job (check integridad + test restore + watchdog ventana perdida)
+- v2.5.304: security+test: restauracion tal-cual probada + montajes seguros
+- v2.5.305: feat: restauracion tal-cual al origen (disco reemplazado) + UI
+- v2.5.306: fix(ui): quitar mensaje respaldo ya programado y boton Eliminar de programacion
+- v2.5.307: feat: jobs diarios solo se ejecutan en su ventana programada (sin catch-up; respaldo solo si hay cambios)
+- v2.5.308: fix(raiz): boveda registrada nunca desaparece por sondeo transitorio + auto-reparacion al listar
+- v2.5.309: fix(raiz): programaciones no desaparecen tras respaldo - cacha multi-boveda + bovedas registradas siempre listadas
+- v2.5.310: fix(raiz): caché espeja historial y estado; el historial del 22:00 ya no queda vacío
+- v2.5.311: refactor(raiz): fuente unica de lectura + espejo auto-reparable + tests de ciclo completo
+- v2.5.312: fix: ETA realista en respaldo + foco en filtros IPS + pantalla Seguridad con pestanas y lista en dialogo
+- v2.5.313: chore(frontend): sanear deps del build (react-router-dom 7.18.4, source-map-js 1.2.2)
+- v2.5.314: feat: limite de ancho de banda del respaldo de red (QoS tc+ifb, default 50% del enlace)
+- v2.5.315: ui(dhcp): pantalla reorganizada con pestanas, cambio de segmento seguro y NSP en .1 + README
+- v2.5.316: fix(backups): solidez - stall watchdog, limpieza QoS al arrancar, no borrar versiones reales, _restic por-job aislado
+- v2.5.317: fix(ui/restore): elegir como destino una unidad/particion aun desmontada (privada/backup por demanda)
+- v2.5.318: seguridad: la restauración nunca toca el disco del sistema + eliminar partición sin rastros en caché
+- v2.5.319: el historial registra que el respaldo se ejecutó aunque no haya versión + CIFS cache=strict
+- v2.5.320: restauraciones robustas: bitácora persistente, interrupción visible con Reintentar/Limpiar
+- v2.5.321: fix: restaurar a la raíz del punto de montaje de una partición privada/backup ahora monta el volumen (antes lo rechazaba como disco del sistema)
+- v2.5.322: restaurar: destino dinamico (cualquier unidad menos backup/sistema) + montaje robusto por identidad
+- v2.5.323: destinos y particiones con identidad útil (rol + etiqueta + espacio libre)
+- v2.5.324: restaurar: montaje verificado por identidad (UUID) — nunca monta el disco equivocado
+- v2.5.325: almacenamiento: reconciliación automática sin rastros de configs eliminadas
+- v2.5.326: identidad canónica (PARTUUID) y auto-reparación de registros — estructura fortalecida
+- v2.5.327: particiones: doble candado nunca tocar el disco del SO (crear/eliminar/redimensionar/formatear)
+- v2.5.328: fix restauración: unidad ext4 nueva se considera vacía (ignora lost+found)
+- v2.5.329: una sola opción de restauración + ortografía estándar en mensajes
+- v2.5.330: restore: excluir particiones de backup como destino + progreso real (%) y tamaño en GB
+- v2.5.331: historial cronológico: respaldos + restauraciones en el job; pantalla sin redundancia
+- v2.5.332: fix: cambiar horarios en la programación de respaldo (red) — ya no falla con ruta no válida
+- v2.5.333: descargas: aviso MUY IMPORTANTE anti-saturación de red (horas no laborales) + confirmación de carpetas
+- v2.5.334: estabilidad: watchdog de memoria (auto-reinicio sin tocar respaldos) + descargas completas/raíz deshabilitadas
+- v2.5.335: unidades red: por nombre resuelve a la IP actual (no se desconecta) + estado Desconectada/motivo siempre visibles
+- v2.5.336: unidades red: nombre→IP actual (o IP fija) + estado Desconectada/motivo + respaldo por horario robusto
+- v2.5.337: respaldos: estado de la unidad EN VIVO (no marca caida por un error viejo)
+- v2.5.338: respaldos: historial y versiones muestran el mismo tamano + conteo de archivos
+- v2.5.338: respaldos: historial y versiones muestran el mismo tamaño (data_added) + conteos de archivos
+- v2.5.339: ui: unidades de red con punto de estado y resumen
+- v2.5.340: ui dispositivos: IP reservada en modo simple + ver detalles persistente + orden de IP numerico
+- v2.5.341: Ataques Externos: proteccion/auditoria reforzada (auto-bloqueo TTL+allowlist+tope, IPs propias reales, dedup acotado, SUM SQL, retencion)
+- v2.5.342: Ataques: bloquear flujos P2P/BitTorrent (peer en ambas direcciones) + excluirlos de la auditoria
+- v2.5.343: Proteccion IPS: filtro por equipo + panel WAN con IP WAN y publica; no versionar logs
+- v2.5.344: Centro de Avisos de Seguridad (postura) + banner al ingresar
+- v2.5.345: Avisos de seguridad (ingreso critico + autorizacion) + banner; clasificacion por tipo + Alertas sin ruido; filtro por equipo en Proteccion
+- v2.5.346: instalador: muestra la version al final
+- v2.5.347: Ataques externos: separa por direccion real (tab Ataques reales entrantes vs Otros flujos salientes) + conteos
+- v2.5.348: feat(egreso): panel de Egreso/Exfiltracion — trafico saliente por equipo y destino (bytes via flujos de Suricata), destinos nuevos (baseline 30d) y subidas anomalas (C2/exfiltracion). Modelo egress_flow_stats + migracion 0036, ingest de flow events, endpoints /ips/egress/* y UI con pestanas Destinos/Equipos/Nuevos/Recientes.
+- v2.5.349: fix(alertas): deja de duplicar (una condicion persistente generaba cientos de repetidos) y aclara los mensajes: severidad en espanol, tipos legibles, sin badge Prioridad, titulos de salud de red legibles; migraciones 0037 (colapsa duplicados) y 0038 (purga IPS informativas). feat(dispositivos): presentacion mejorada — resumen en tarjetas con color, filtros como chips con contador y contador de resultados.
+- v2.5.350: Seguridad: CSP y cabeceras, admin sin reset implicito, credenciales SMB por POST, firma Ed25519 y docs sin IPs internas
+- v2.5.351: fix(update): preserva config.yaml de cada maquina; el instalador ya no lleva las NICs del Dev
+- v2.5.352: fix(update): conserva config.yaml al actualizar desde la UI
+- v2.5.353: fix(update): descarga el paquete versionado y evita cache viejo del CDN
+- v2.5.354: fix(install): instalación limpia desde USB/zip y frontend del paquete sin npm
+- v2.5.355: feat(install): muestra la clave inicial de admin al final de la instalación
+- v2.5.356: fix(health): evita alerta falsa de IPS cuando Suricata se reinicia
+- v2.5.357: fix(health): sin alertas falsas en el auto-diagnostico de arranque (schema dinamico, nft valido, Suricata por cmdline, UDP, reintento)
