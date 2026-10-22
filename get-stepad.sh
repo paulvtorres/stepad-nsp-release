@@ -173,26 +173,35 @@ if [ -f "${ENV_FILE}" ]; then
   echo "==> Env respaldado en ${DEST} (por si se necesita recuperar claves)"
 fi
 
-# La config de red/DHCP es estado propio de CADA máquina y el instalador
-# trae un config.yaml genérico. Sin esto, el rm -rf de abajo la borraba y
-# cada update podía dejar WAN/LAN con las interfaces de la máquina de
-# desarrollo. Se conserva y se restaura después de extraer.
-CONFIG_FILE="/home/${APP_USER}/stepad-nsp/backend/shared/config/config.yaml"
+# La config de red/DHCP es estado propio de CADA máquina y vive en
+# /etc/stepad/config.yaml. El instalador trae una config.yaml generica en
+# el repo: sin este respaldo, el rm -rf de abajo la borraba y cada
+# update podía dejar WAN/LAN con las interfaces de la maquina de
+# desarrollo. Instalaciones viejas tenían la config dentro del repo:
+# esa ruta se acepta como origen del respaldo.
+SYSTEM_CONFIG="/etc/stepad/config.yaml"
+LEGACY_CONFIG="/home/${APP_USER}/stepad-nsp/backend/shared/config/config.yaml"
 CONFIG_BACKUP=""
-if [ -f "${CONFIG_FILE}" ]; then
+if [ -f "${SYSTEM_CONFIG}" ]; then
   CONFIG_BACKUP="$(mktemp /tmp/stepad-config.XXXXXX)"
-  cp -a "${CONFIG_FILE}" "${CONFIG_BACKUP}"
+  cp -a "${SYSTEM_CONFIG}" "${CONFIG_BACKUP}"
   echo "==> config.yaml actual respaldado para restaurarlo tras el update"
+elif [ -f "${LEGACY_CONFIG}" ]; then
+  CONFIG_BACKUP="$(mktemp /tmp/stepad-config.XXXXXX)"
+  cp -a "${LEGACY_CONFIG}" "${CONFIG_BACKUP}"
+  echo "==> config.yaml (ruta antigua) respaldado para restaurarlo tras el update"
 fi
 
 rm -rf "/home/${APP_USER}/stepad-nsp"
 tar xzf /tmp/stepad-nsp-installer.tar.gz -C "/home/${APP_USER}"
 
 if [ -n "${CONFIG_BACKUP}" ] && [ -f "${CONFIG_BACKUP}" ]; then
-  cp -a "${CONFIG_BACKUP}" "${CONFIG_FILE}"
-  chown "${APP_USER}:${APP_USER}" "${CONFIG_FILE}"
+  mkdir -p /etc/stepad
+  cp -a "${CONFIG_BACKUP}" "${SYSTEM_CONFIG}"
+  chown "${APP_USER}:${APP_USER}" "${SYSTEM_CONFIG}"
+  chmod 0640 "${SYSTEM_CONFIG}"
   rm -f "${CONFIG_BACKUP}"
-  echo "==> config.yaml de esta máquina restaurado"
+  echo "==> config.yaml de esta máquina restaurado en ${SYSTEM_CONFIG}"
 fi
 
 echo "==> Instalando (detecta si ya existe una versión y la actualiza)"
