@@ -12,6 +12,8 @@
 set -euo pipefail
 
 URL="${1:-${STEPAD_INSTALLER_URL:-}}"
+FIXED_URL=""
+[ -n "${URL}" ] && FIXED_URL=1
 APP_USER="${APP_USER:-paulan}"
 RELEASE_REPO="paulvtorres/stepad-nsp-release"
 BASE="https://raw.githubusercontent.com/${RELEASE_REPO}/main"
@@ -25,6 +27,29 @@ MCowBQYDK2VwAyEA1SUJEUgdTfDMbXLXRrkljB1NeV4LXa0qa0iQVPnvrwE=
 -----END PUBLIC KEY-----
 EOF
 )"
+
+# Comparación de versiones tipo v2.5.10 > v2.5.9 (no basta sort alfabético).
+# Se usa para no DEGRADAR una instalación si el CDN sirve un VERSION atrasado:
+# eso reinstalaba una versión vieja y, con los cambios de instalador, abortaba
+# la actualización a mitad de camino.
+version_ge() {
+    [ -n "${1:-}" ] || return 1
+    [ -n "${2:-}" ] || return 0
+    [ "${1}" = "${2}" ] && return 0
+    local lowest
+    lowest="$(printf '%s\n%s\n' "${1}" "${2}" | sort -V | head -1)"
+    [ "${lowest}" = "${2}" ]
+}
+
+# Autotest (lo usan los tests): --compare-versions
+if [ "${1:-}" = "--compare-versions" ]; then
+    if version_ge "${STEPAD_VC_A:-}" "${STEPAD_VC_B:-}"; then
+        echo "ge"
+    else
+        echo "lt"
+    fi
+    exit 0
+fi
 
 if [ "$(id -u)" -ne 0 ]; then
     echo "Ejecuta como root: ... | sudo bash"
@@ -59,6 +84,17 @@ verify_installer() {
         >/dev/null 2>&1
 }
 
+installed_version() {
+    local file="/etc/stepad/version"
+    [ -r "${file}" ] || return 0
+    tr -d '\r\n' < "${file}" || true
+}
+
+package_version() {
+    tar -xOf /tmp/stepad-nsp-installer.tar.gz stepad-nsp/VERSION 2>/dev/null \
+        | tr -d '\r\n' || true
+}
+
 installer_ok() {
     # OJO: con `pipefail` activo, "tar -xOf ... | head -1 | grep -q ..."
     # puede fallar por una condicion de carrera de SIGPIPE (head/grep
@@ -77,7 +113,20 @@ installer_ok() {
     content="$(tar -xOf /tmp/stepad-nsp-installer.tar.gz \
         stepad-nsp/backend/backups/models/backup_settings.py 2>/dev/null || true)"
 
-    [[ "${content}" == *"Integer, String"* ]]
+    [[ "${content}" == *"Integer, String"* ]] || return 1
+
+    # No degradar: si el paquete es más viejo que lo instalado, se trata
+    # como "no válido" y el bucle reintenta (el CDN suele estar propagando).
+    local installed pkg
+    installed="$(installed_version)"
+    pkg="$(package_version)"
+
+    if [ -n "${installed}" ] && [ -n "${pkg}" ] \
+       && ! version_ge "${pkg}" "${installed}"; then
+        return 1
+    fi
+
+    return 0
 }
 
 VERSION=""
@@ -109,18 +158,25 @@ wait_seconds=10
 
 while ! installer_ok; do
     if [ "${attempt}" -ge "${max_attempts}" ]; then
-        echo "ERROR: el instalador descargado sigue incompleto/obsoleto tras ${attempt} intentos"
-        echo "(falta la migración 0009 o el fix de backup_settings)."
-        echo "Esto suele ser el CDN de GitHub propagando el release; espera 1-2"
-        echo "minutos y reintenta el mismo comando, o aplica el parche manual:"
-        echo "  sudo sed -i 's/Integer\$/Integer, String/' /home/${APP_USER}/stepad-nsp/backend/backups/models/backup_settings.py"
-        echo "  sudo bash /home/${APP_USER}/stepad-nsp/install.sh"
+        echo "ERROR: el instalador descargado no es utilizable tras ${attempt} intentos."
+        echo "Causas posibles:"
+        echo "  - El CDN de GitHub aún sirve un VERSION/paquete atrasado"
+        echo "    (instalado: $(installed_version || echo '?'), paquete: $(package_version || echo '?'))"
+        echo "  - El paquete no trae la migración 0009 o el fix de backup_settings."
+        echo "Espera 1-2 minutos y repite el mismo comando. Nunca se degrada"
+        echo "una instalación a una versión anterior: se aborta sin tocar nada."
         exit 1
     fi
 
     echo "AVISO: paquete obsoleto/incompleto (posible CDN sin propagar);"
     echo "       reintentando en ${wait_seconds}s (intento $((attempt + 1))/${max_attempts})..."
     sleep "${wait_seconds}"
+
+    # Re-resolver la versión en cada reintento: si el CDN ya propagó,
+    # el siguiente intento baja el paquete correcto.
+    if [ -z "${FIXED_URL}" ]; then
+        VERSION="$(curl -fsSL "${BASE}/VERSION?$(date +%s)" | tr -d '\r\n' || true)"
+    fi
 
     if [ -n "${VERSION}" ]; then
         download_installer "${BASE}/stepad-nsp-installer-${VERSION}.tar.gz?$(date +%s%N)"
