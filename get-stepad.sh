@@ -172,18 +172,24 @@ while ! installer_ok; do
     echo "       reintentando en ${wait_seconds}s (intento $((attempt + 1))/${max_attempts})..."
     sleep "${wait_seconds}"
 
-    # Re-resolver la versión en cada reintento: si el CDN ya propagó,
-    # el siguiente intento baja el paquete correcto.
-    if [ -z "${FIXED_URL}" ]; then
-        VERSION="$(curl -fsSL "${BASE}/VERSION?$(date +%s)" | tr -d '\r\n' || true)"
-    fi
-
-    if [ -n "${VERSION}" ]; then
-        download_installer "${BASE}/stepad-nsp-installer-${VERSION}.tar.gz?$(date +%s%N)"
-        SIG_URL="${BASE}/stepad-nsp-installer-${VERSION}.tar.gz.sig"
+    if [ -n "${FIXED_URL}" ]; then
+        # URL explícita: se reintenta EXACTAMENTE el mismo paquete (nunca
+        # se cambia a "latest", que podría no ser lo que pidió el usuario).
+        FIXED_BASE="${URL%%\?*}"
+        download_installer "${FIXED_BASE}?$(date +%s%N)"
+        SIG_URL="${FIXED_BASE}.sig"
     else
-        download_installer "${BASE}/stepad-nsp-installer.tar.gz?$(date +%s%N)"
-        SIG_URL="${BASE}/stepad-nsp-installer.tar.gz.sig"
+        # Re-resolver la versión en cada reintento: si el CDN ya propagó,
+        # el siguiente intento baja el paquete correcto.
+        VERSION="$(curl -fsSL "${BASE}/VERSION?$(date +%s)" | tr -d '\r\n' || true)"
+
+        if [ -n "${VERSION}" ]; then
+            download_installer "${BASE}/stepad-nsp-installer-${VERSION}.tar.gz?$(date +%s%N)"
+            SIG_URL="${BASE}/stepad-nsp-installer-${VERSION}.tar.gz.sig"
+        else
+            download_installer "${BASE}/stepad-nsp-installer.tar.gz?$(date +%s%N)"
+            SIG_URL="${BASE}/stepad-nsp-installer.tar.gz.sig"
+        fi
     fi
     download_signature "${SIG_URL}?$(date +%s%N)"
 
