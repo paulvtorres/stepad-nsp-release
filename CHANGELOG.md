@@ -1,5 +1,28 @@
 # Changelog STEPAD NSP
 
+## 2026-10-28
+
+- **v2.5.371** fix(backups): la alerta "Respaldo sin correr" ya no se adelanta (15 min de gracia vs 30 de ventana de ejecución)
+- **v2.5.370** fix(topbar): DHCP y "respaldo en curso" vuelven a actualizarse · chore(backend): 129 `except Exception: pass` dejan traza en debug
+- **v2.5.369** chore(frontend): lint sin errores (72 -> 0) · fix(bug real): la tarjeta "Cortes de internet" usaba `formatDuration` sin definirla
+- **v2.5.368** fix(bandwidth): números de bajada/subida legibles (contraste)
+- **v2.5.367** fix(bandwidth): tasa WAN con ventana de 10 s (comparable con la tabla)
+- **v2.5.366** fix(bandwidth): solo tráfico a Internet y NSP etiquetado (fin del 5000%)
+- **v2.5.365** perf(frontend): code splitting; bundle inicial 734 kB -> 291 kB
+- **v2.5.364** feat(auth): sesión en cookie HttpOnly; el JWT ya no vive en localStorage
+- **v2.5.363** fix(update): el reintento con URL fija respeta el paquete pedido
+- **v2.5.362** fix(update): el instalador no degrada si el CDN sirve un VERSION atrasado
+- **v2.5.361** fix(content): sync de categorías sin bloquear el arranque (17k dominios en una sola sincronización)
+- **v2.5.360** fix(install): configure_suricata usa /etc/stepad/config.yaml (el update ya no se corta)
+- **v2.5.359** feat(bandwidth): panel de Ancho de banda en vivo (WAN + por equipo) con histórico de 60 min
+- **v2.5.358** feat(config): la config vive en /etc/stepad/config.yaml (fuera del repo)
+- **v2.5.357** fix(health): sin alertas falsas en el auto-diagnóstico de arranque
+
+Limpieza de seguridad del mismo día:
+
+- Repo público de releases reconstruido: se eliminaron los instaladores v2.5.100–v2.5.356, que incluían la contraseña de admin por defecto en `install.sh`. Ahora solo se publica el instalador actual (firma Ed25519 verificada).
+- Historial del repo de código reescrito para eliminar la contraseña antigua y una auth key de Tailscale.
+
 Historial de releases (el repo se reconstruyo el 2026-10-21 para eliminar
 instaladores antiguos que incluian la contrasena de admin por defecto).
 
