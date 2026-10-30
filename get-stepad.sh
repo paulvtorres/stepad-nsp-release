@@ -232,6 +232,8 @@ if [ -f "${ENV_FILE}" ]; then
   cp -a "${ENV_FILE}" "${DEST}"
   chmod 0600 "${DEST}"
   find "${BK_DIR}" -maxdepth 1 -name "stepad.env.*" -type f -mtime +90 -delete 2>/dev/null
+  # Cap por cantidad: el limite de 90 dias no alcanza (habia miles).
+  ls -1t "${BK_DIR}"/stepad.env.* 2>/dev/null | tail -n +201 | xargs -r rm -f 2>/dev/null
   echo "==> Env respaldado en ${DEST} (por si se necesita recuperar claves)"
 fi
 
