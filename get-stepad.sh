@@ -18,6 +18,18 @@ APP_USER="${APP_USER:-paulan}"
 RELEASE_REPO="paulvtorres/stepad-nsp-release"
 BASE="https://raw.githubusercontent.com/${RELEASE_REPO}/main"
 
+# Guard: un equipo marcado como DESARROLLO conserva el repo y el venv;
+# el instalador los borra. Actualizarlo con: git pull + restart.
+DEV_MARKER="/etc/stepad/development"
+if [ -e "${DEV_MARKER}" ] && [ "${STEPAD_ALLOW_INSTALL:-0}" != "1" ]; then
+    echo "ERROR: ${DEV_MARKER} existe: este equipo está marcado como DESARROLLO." >&2
+    echo "El instalador borra el repositorio (.git) y el venv." >&2
+    echo "Actualizá con: git -C ~/stepad-nsp pull && sudo systemctl restart stepad-nsp" >&2
+    echo "Para forzar igualmente (no recomendado): STEPAD_ALLOW_INSTALL=1" >&2
+    exit 1
+fi
+
+
 # Clave pública (Ed25519) que firma los instaladores. La privada vive
 # SOLO en la máquina de desarrollo (~/.config/stepad/update-signing.key)
 # y nunca se publica. Cambiar de clave = editar este bloque y republicar.
