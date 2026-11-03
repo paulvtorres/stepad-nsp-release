@@ -21,7 +21,11 @@ BASE="https://raw.githubusercontent.com/${RELEASE_REPO}/main"
 # Guard: un equipo marcado como DESARROLLO conserva el repo y el venv;
 # el instalador los borra. Actualizarlo con: git pull + restart.
 DEV_MARKER="/etc/stepad/development"
-if [ -e "${DEV_MARKER}" ] && [ "${STEPAD_ALLOW_INSTALL:-0}" != "1" ]; then
+case "${1:-}" in
+    --compare-versions|--help|-h) SELFTEST=1 ;;
+    *) SELFTEST=0 ;;
+esac
+if [ "${SELFTEST}" -eq 0 ] && [ -e "${DEV_MARKER}" ] && [ "${STEPAD_ALLOW_INSTALL:-0}" != "1" ]; then
     echo "ERROR: ${DEV_MARKER} existe: este equipo está marcado como DESARROLLO." >&2
     echo "El instalador borra el repositorio (.git) y el venv." >&2
     echo "Actualizá con: git -C ~/stepad-nsp pull && sudo systemctl restart stepad-nsp" >&2
