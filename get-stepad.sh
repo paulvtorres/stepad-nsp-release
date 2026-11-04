@@ -445,4 +445,4 @@ if [ -n "${CONFIG_BACKUP}" ] && [ -f "${CONFIG_BACKUP}" ]; then
 fi
 
 echo "==> Instalando (detecta si ya existe una versión y la actualiza)"
-bash "/home/${APP_USER}/stepad-nsp/install.sh"
+STEPAD_SKIP_ROLLBACK_POINT=1 bash "/home/${APP_USER}/stepad-nsp/install.sh"
