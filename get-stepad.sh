@@ -294,6 +294,13 @@ installer_ok() {
         return 1
     fi
 
+    # La versión del paquete debe coincidir EXACTAMENTE con la versión
+    # resuelta del release. Antes bastaba con que no fuera más vieja, así
+    # que un CDN que servía 508 bajo la URL de 509 instalaba 508 sin avisar.
+    if [ -n "${VERSION:-}" ] && [ -n "${pkg}" ] && [ "${pkg}" != "${VERSION}" ]; then
+        return 1
+    fi
+
     return 0
 }
 
