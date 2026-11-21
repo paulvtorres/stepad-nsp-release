@@ -432,10 +432,16 @@ elif [ -f "${LEGACY_CONFIG}" ]; then
 fi
 
 echo "==> Guardando punto de retorno (rollback)"
+PRE_UPDATE_POINT=""
+POINT_BEFORE="$(ls -1t /var/lib/stepad/rollback/*.app.tar.gz 2>/dev/null | head -1 || true)"
 if tar -xOf /tmp/stepad-nsp-installer.tar.gz \
     stepad-nsp/scripts/rollback-point.sh > /tmp/stepad-rollback-point.sh 2>/dev/null; then
     STEPAD_APP_DIR="/home/${APP_USER}/stepad-nsp" \
         bash /tmp/stepad-rollback-point.sh || true
+    POINT_AFTER="$(ls -1t /var/lib/stepad/rollback/*.app.tar.gz 2>/dev/null | head -1 || true)"
+    if [ -n "${POINT_AFTER}" ] && [ "${POINT_AFTER}" != "${POINT_BEFORE}" ]; then
+        PRE_UPDATE_POINT="${POINT_AFTER}"
+    fi
     rm -f /tmp/stepad-rollback-point.sh
 fi
 
@@ -452,4 +458,5 @@ if [ -n "${CONFIG_BACKUP}" ] && [ -f "${CONFIG_BACKUP}" ]; then
 fi
 
 echo "==> Instalando (detecta si ya existe una versión y la actualiza)"
-STEPAD_SKIP_ROLLBACK_POINT=1 bash "/home/${APP_USER}/stepad-nsp/install.sh"
+STEPAD_SKIP_ROLLBACK_POINT=1 STEPAD_PRE_UPDATE_POINT="${PRE_UPDATE_POINT}" \
+    bash "/home/${APP_USER}/stepad-nsp/install.sh"
